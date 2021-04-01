@@ -92,3 +92,14 @@ class api:
                 'message': content
             }
         requests.get(url, params = params)
+
+    @staticmethod
+    def send_msg_news(group_id, game):
+        url = urlPrefix + 'send_msg'
+        content = api.grab(game)
+        params = {
+            'message_type': 'group',
+            'group_id': group_id,
+            'message': content
+        }
+        requests.get(url, params = params)
