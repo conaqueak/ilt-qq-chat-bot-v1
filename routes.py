@@ -14,4 +14,6 @@ def register_routes(app):
 			api.send_msg_news(data['group_id'], 'ffxiv')
 		elif data['message'] == '/apex news':
 			api.send_msg_news(data['group_id'], 'apex')
+		elif data['message'] == '/ow news':
+			api.send_msg_news(data['group_id'], 'ow')
 		return 'OK'
