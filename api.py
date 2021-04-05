@@ -103,3 +103,100 @@ class api:
             'message': content
         }
         requests.get(url, params = params)
+
+    @staticmethod
+    def send_msg_apex_player(user_id, group_id, name):
+        params = {
+            'auth': '4e023e657628f823c1fbb0d9f09e61e3',
+            'player': name,
+            'platform': 'PC',
+            'enableClubsBeta': 'true'
+        }
+        url = 'https://api.mozambiquehe.re/bridge'
+        res = requests.get(url, params = params)
+        content = res.text
+        dic = json.loads(content)
+        ban = None
+        if dic["global"]["bans"]["isActive"] == False:
+            ban = '否'
+        else:
+            ban = '是'
+        rank = None
+        rankScore = dic["global"]["rank"]["rankScore"]
+        rankDiv = str(dic["global"]["rank"]["rankDiv"])
+        brLadderPos = dic["global"]["rank"]["ladderPosPlatform"]
+        if dic["global"]["rank"]["rankName"] == 'Unranked':
+            rank = '未定级'
+        elif dic["global"]["rank"]["rankName"] == 'Rookie':
+            rank = '菜鸟' + rankDiv + f'（{rankScore}分）'
+        elif dic["global"]["rank"]["rankName"] == 'Bronze':
+            rank = '青铜' + rankDiv + f'（{rankScore}分）'
+        elif dic["global"]["rank"]["rankName"] == 'Silver':
+            rank = '白银' + rankDiv + f'（{rankScore}分）'
+        elif dic["global"]["rank"]["rankName"] == 'Gold':
+            rank = '黄金' + rankDiv + f'（{rankScore}分）'
+        elif dic["global"]["rank"]["rankName"] == 'Platinum':
+            rank = '白金' + rankDiv + f'（{rankScore}分）'
+        elif dic["global"]["rank"]["rankName"] == 'Diamond':
+            rank = '钻石' + rankDiv + f'（{rankScore}分）'
+        elif dic["global"]["rank"]["rankName"] == 'Master':
+            rank = '大师' + f'（{rankScore}）'
+        elif dic["global"]["rank"]["rankName"] == 'Apex Predator':
+            rank = '猎杀者' + f'#{brLadderPos}' + f'（{rankScore}分）'
+        arena = None
+        arenaScore = dic["global"]["arena"]["rankScore"]
+        arenaDiv = str(dic["global"]["arena"]["rankDiv"])
+        aLadderPos = dic["global"]["arena"]["ladderPosPlatform"]
+        if dic["global"]["arena"]["rankName"] == 'Unranked':
+            arena = '未定级'
+        elif dic["global"]["arena"]["rankName"] == 'Rookie':
+            arena = '菜鸟' + arenaDiv + f'（{arenaScore}分）'
+        elif dic["global"]["arena"]["rankName"] == 'Bronze':
+            arena = '青铜' + arenaDiv + f'（{arenaScore}分）'
+        elif dic["global"]["arena"]["rankName"] == 'Silver':
+            arena = '白银' + arenaDiv + f'（{arenaScore}分）'
+        elif dic["global"]["arena"]["rankName"] == 'Gold':
+            arena = '黄金' + arenaDiv + f'（{arenaScore}分）'
+        elif dic["global"]["arena"]["rankName"] == 'Platinum':
+            arena = '白金' + arenaDiv + f'（{arenaScore}分）'
+        elif dic["global"]["arena"]["rankName"] == 'Diamond':
+            arena = '钻石' + arenaDiv + f'（{arenaScore}分）'
+        elif dic["global"]["arena"]["rankName"] == 'Master':
+            arena = '大师' + f'（{arenaScore}）'
+        elif dic["global"]["arena"]["rankName"] == 'Apex Predator':
+            arena = '猎杀者' + f'#{aLadderPos}' + f'（{arenaScore}分）'
+        lobbyState = dic["realtime"]["lobbyState"]
+        if lobbyState == 'open':
+            lobbyState = '公开'
+        isOnline = dic["realtime"]["isOnline"]
+        if isOnline:
+            isOnline = '在线'
+        else:
+            isOnline = '离线'
+        isInGame = dic["realtime"]["isInGame"]
+        if isInGame:
+            isInGame = '正在游戏中'
+        else:
+            isInGame = '大厅待机中'
+        canJoin = dic["realtime"]["canJoin"]
+        if canJoin:
+            canJoin = '可加入'
+        else:
+            canJoin = '不可加入'
+        partyFull = dic["realtime"]["partyFull"]
+        if partyFull:
+            partyFull = '满编小队'
+        else:
+            partyFull = '轻锐小队'
+        currentTime = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime())
+        content = f'[CQ:at,qq={user_id}]\n查询时间：{currentTime}\n玩家名称：{dic["global"]["name"]}\n当前状态：{isOnline}（{isInGame}）\n当前等级：{dic["global"]["level"]}\n当前经验：{dic["global"]["toNextLevelPercent"]}%\n禁赛状态：{ban}\n大逃杀段位：{rank}\n竞技场段位：{arena}\n组队状态：{lobbyState}{partyFull}（{canJoin}）\n'
+        club = dic['club']['id']
+        if club != None:
+            content = f'[CQ:image,file={dic["club"]["logo"]}]\n' + content + f'俱乐部：[{dic["club"]["tag"]}] {dic["club"]["name"]}（{dic["club"]["groupSize"]}/{dic["club"]["maxGroupSize"]}）'
+        params = {
+            'message_type': 'group',
+            'group_id': group_id,
+            'message': content
+        }
+        url = urlPrefix + 'send_msg'
+        requests.get(url, params = params)

@@ -1,4 +1,5 @@
 from flask import request
+import re
 from api import api
 
 def register_routes(app):
@@ -16,4 +17,7 @@ def register_routes(app):
 			api.send_msg_news(data['group_id'], 'apex')
 		elif data['message'] == '/ow news':
 			api.send_msg_news(data['group_id'], 'ow')
+		elif re.search('^/apex player [^ ]*', data['message']):
+			name = re.compile(r'^/apex player (?P<name>[^ ]*)').search(data['message']).group('name')
+			api.send_msg_apex_player(data['user_id'], data['group_id'], name)
 		return 'OK'
