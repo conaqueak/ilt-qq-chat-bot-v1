@@ -20,4 +20,6 @@ def register_routes(app):
 		elif re.search('^/apex player [^ ]*', data['message']):
 			name = re.compile(r'^/apex player (?P<name>[^ ]*)').search(data['message']).group('name')
 			api.send_msg_apex_player(data['user_id'], data['group_id'], name)
+		elif data['message'] == '/apex map':
+			api.send_msg_apex_map(data['user_id'], data['group_id'])
 		return 'OK'

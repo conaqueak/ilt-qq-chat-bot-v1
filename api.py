@@ -3,6 +3,7 @@ import json
 import re
 import time
 from config import urlPrefix
+from utils import transToChinese, endTime, timeRemain
 
 class api:
     @staticmethod
@@ -193,6 +194,58 @@ class api:
         club = dic['club']['id']
         if club != None:
             content = f'[CQ:image,file={dic["club"]["logo"]}]\n' + content + f'俱乐部：[{dic["club"]["tag"]}] {dic["club"]["name"]}（{dic["club"]["groupSize"]}/{dic["club"]["maxGroupSize"]}）'
+        params = {
+            'message_type': 'group',
+            'group_id': group_id,
+            'message': content
+        }
+        url = urlPrefix + 'send_msg'
+        requests.get(url, params = params)
+
+    @staticmethod
+    def send_msg_apex_map(user_id, group_id):
+        params = {
+            'auth': '4e023e657628f823c1fbb0d9f09e61e3',
+            'version': '2'
+        }
+        url = 'https://api.mozambiquehe.re/maprotation'
+        res = requests.get(url, params = params)
+        content = res.text
+        dic = json.loads(content)
+        brCurrent = dic["battle_royale"]["current"]["map"]
+        brCurrent = transToChinese(brCurrent)
+        brEndTime = endTime(dic["battle_royale"]["current"]["end"])
+        brTimeRemain = timeRemain(dic["battle_royale"]["current"]["remainingSecs"])
+        brNext = dic["battle_royale"]["next"]["map"]
+        brNext = transToChinese(brNext)
+        brNextDuration = timeRemain(dic["battle_royale"]["next"]["DurationInSecs"])
+
+        brRankCurrent = dic["ranked"]["current"]["map"]
+        brRankCurrent = transToChinese(brRankCurrent)
+        brRankEndTime = endTime(dic["ranked"]["current"]["end"])
+        brRankTimeRemain = timeRemain(dic["ranked"]["current"]["remainingSecs"])
+        brRankNext = dic["ranked"]["next"]["map"]
+        brRankNext = transToChinese(brRankNext)
+        brRankNextDuration = timeRemain(dic["ranked"]["next"]["DurationInSecs"])
+
+        aCurrent = dic["arenas"]["current"]["map"]
+        aCurrent = transToChinese(aCurrent)
+        aEndTime = endTime(dic["arenas"]["current"]["end"])
+        aTimeRemain = timeRemain(dic["arenas"]["current"]["remainingSecs"])
+        aNext = dic["arenas"]["next"]["map"]
+        aNext = transToChinese(aNext)
+        aNextDuration = timeRemain(dic["arenas"]["next"]["DurationInSecs"])
+
+        aRankCurrent = dic["arenasRanked"]["current"]["map"]
+        aRankCurrent = transToChinese(aRankCurrent)
+        aRankEndTime = endTime(dic["arenasRanked"]["current"]["end"])
+        aRankTimeRemain = timeRemain(dic["arenasRanked"]["current"]["remainingSecs"])
+        aRankNext = dic["arenasRanked"]["next"]["map"]
+        aRankNext = transToChinese(aRankNext)
+        aRankNextDuration = timeRemain(dic["arenasRanked"]["next"]["DurationInSecs"])
+
+        currentTime = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime())
+        content = f'[CQ:at,qq={user_id}]\n查询时间：{currentTime}\n>【大逃杀丨匹配模式】\n当前地图：{brCurrent}\n结束时间：{brEndTime}\n剩余时间：{brTimeRemain}\n即将轮换：{brNext}\n持续时间：{brNextDuration}\n>【大逃杀丨排位模式】\n当前地图：{brRankCurrent}\n结束时间：{brRankEndTime}\n剩余时间：{brRankTimeRemain}\n即将轮换：{brRankNext}\n持续时间：{brRankNextDuration}\n>【竞技场丨匹配模式】\n当前地图：{aCurrent}\n结束时间：{aEndTime}\n剩余时间：{aTimeRemain}\n即将轮换：{aNext}\n持续时间：{aNextDuration}\n>【竞技场丨排位模式】\n当前地图：{aRankCurrent}\n结束时间：{aRankEndTime}\n剩余时间：{aRankTimeRemain}\n即将轮换：{aRankNext}\n持续时间：{aRankNextDuration}'
         params = {
             'message_type': 'group',
             'group_id': group_id,
