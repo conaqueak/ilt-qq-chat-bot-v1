@@ -22,4 +22,6 @@ def register_routes(app):
 			api.send_msg_apex_player(data['user_id'], data['group_id'], name)
 		elif data['message'] == '/apex map':
 			api.send_msg_apex_map(data['user_id'], data['group_id'])
+		elif data['message'] == '/apex predator':
+			api.send_msg_apex_predator(data['user_id'], data['group_id'])
 		return 'OK'

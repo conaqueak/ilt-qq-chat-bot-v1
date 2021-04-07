@@ -253,3 +253,28 @@ class api:
         }
         url = urlPrefix + 'send_msg'
         requests.get(url, params = params)
+
+    @staticmethod
+    def send_msg_apex_predator(user_id, group_id):
+        params = {
+            'auth': '4e023e657628f823c1fbb0d9f09e61e3'
+        }
+        url = 'https://api.mozambiquehe.re/predator'
+        res = requests.get(url, params = params)
+        content = res.text
+        dic = json.loads(content)
+        totalBRMaster = dic["RP"]["PC"]["totalMastersAndPreds"]
+        if totalBRMaster > 750:
+            totalBRMaster -= 750
+        totalAMaster = dic["AP"]["PC"]["totalMastersAndPreds"]
+        if totalAMaster > 750:
+            totalAMaster -= 750
+        currentTime = time.strftime('%Y/%m/%d %H:%M:%S', time.localtime())
+        content = f'[CQ:at,qq={user_id}]\n>【大逃杀模式】\n猎杀者分数线：{dic["RP"]["PC"]["val"]}\n大师总人数：{totalBRMaster}\n>【竞技场模式】\n猎杀者分数线：{dic["AP"]["PC"]["val"]}\n大师总人数：{totalAMaster}'
+        params = {
+            'message_type': 'group',
+            'group_id': group_id,
+            'message': content
+        }
+        url = urlPrefix + 'send_msg'
+        requests.get(url, params = params)
