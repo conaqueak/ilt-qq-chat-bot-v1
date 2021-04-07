@@ -278,3 +278,50 @@ class api:
         }
         url = urlPrefix + 'send_msg'
         requests.get(url, params = params)
+
+    @staticmethod
+    def get_compare_send():
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'
+        }
+        params = {
+            'url': 'List?gameCode=ff',
+            'category': '5309,5310,5311,5312,5313',
+            'pageIndex': '1',
+            'pageSize': '5',
+            'callback': '_jsonpvvsnq69ejrl'
+        }
+        url = 'https://ff.web.sdo.com/inc/newdata.ashx'
+        res = requests.get(url, params = params, headers = headers)
+        data = res.text
+        obj = re.compile(r'_json[0-9a-z]{12}\((?P<json>.*?)\)')
+        content = obj.search(data).group('json')
+        dic = json.loads(content)
+        list = dic['Data']
+        i = 0
+        oldId = list[i]['Id']
+        while True:
+            res = requests.get(url, params = params, headers = headers)
+            data = res.text
+            obj = re.compile(r'_json[0-9a-z]{12}\((?P<json>.*?)\)')
+            content = obj.search(data).group('json')
+            dic = json.loads(content)
+            list = dic['Data']
+            id = list[i]['Id']
+            time.sleep(5)
+            if oldId == id:
+                i = 0
+                oldId = list[i]['Id']
+                print('未检测到新内容')
+                continue
+            id = list[i]['Id']
+            title = list[i]['Title']
+            text = list[i]['Summary']
+            location = list[i]['Author']
+            image = list[i]['HomeImagePath']
+            publish = list[i]['PublishDate']
+            mix = f'[CQ:image,file={image}]\n标题：{title}\n内容：{text}\n发布时间：{publish}\n{location}'
+            api.send_msg('group', '21296949', '600082002', mix)
+            print('检测到新的公告！')
+            print(mix)
+            i += 1
